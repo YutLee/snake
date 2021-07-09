@@ -3,9 +3,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-  <title>Greedy snake</title>
-  <meta name="keywords" content="Greedy snake">
-  <meta name="description" content="Greedy snake">
+  <title>贪吃蛇(Greedy snake)</title>
+  <meta name="keywords" content="贪吃蛇,Greedy snake">
+  <meta name="description" content="贪吃蛇,Greedy snake">
   <style>
     body {
       padding: 0;
@@ -143,17 +143,18 @@
     </div>
   </div>
   <script>
-    let maxX = 10, maxY = 13, maxSize = maxX * maxY, snakes = [], food
+    let maxX = 10, maxY = 11, maxSize = maxX * maxY, snakes = [], food
     let directions = [[-1, 0], [0, -1], [1, 0], [0, 1]]// createInt(4) // direction 0:左,1:上,2:右,3:下
     let directionIdx = createInt(4)
     let direction = directions[directionIdx]
     let gameOver = false, timer, isPause = false
     let score = 0 // 得分
+    let speed = 500
 
     createSpaceUI()
     start()
 
-    document.addEventListener('keydown', handleKeyDown, false)
+    window.addEventListener('keydown', handleKeyDown, false)
 
     document.getElementById('handle').addEventListener('click', handleClick, false)
 
@@ -200,7 +201,6 @@
 
       if (isForward) {
         clearTimeout(timer)
-        move(false)
         move()
       }
 
@@ -258,19 +258,19 @@
      * 重新开始游戏
      */
     function restart () {
-      const snakeDom = document.getElementsByClassName('snake')
       const foodDom = document.getElementsByClassName('food')
+      let snakeDom
 
-      if (snakeDom) {
-        for (var i = 0; i < snakeDom.length; i++) {
+      snakes.forEach((item, idx) => {
+        snakeDom = document.getElementsByClassName('snake')
+
+        if (snakeDom && snakeDom[0]) {
           snakeDom[0].className = 'column'
         }
-      }
+      })
 
-      if (foodDom) {
-        for (var i = 0; i < foodDom.length; i++) {
-          foodDom[0].className = 'column'
-        }
+      if (foodDom && foodDom[0]) {
+        foodDom[0].className = 'column'
       }
 
       snakes = []
@@ -278,6 +278,7 @@
       direction = directions[directionIdx]
       gameOver = false
       isPause = false
+      score = 0
       start()
     }
 
@@ -289,13 +290,6 @@
       createFood(snakes)
       snakeMove()
       move()
-    }
-
-    /**
-     * 游戏暂停
-     */
-    function pause () {
-
     }
 
     /**
@@ -376,7 +370,7 @@
     /**
      * 蛇移动
      */
-    function move (auto = true) {
+    function move () {
       const head = snakes[0]
       const x = head[0] + direction[0]
       const y = head[1] + direction[1]
@@ -403,7 +397,7 @@
         return
       }
 
-      if (isTail(x, y)) {
+      if (isSelf(x, y)) {
         gameOver = true
         clearEvent('蛇吃了自己')
         return
@@ -415,18 +409,9 @@
         return
       }
 
-      if (auto) {
-        timer = setTimeout(() => {
-          move()
-        }, 1000)
-      }
-    }
-
-    /**
-     * 蛇转向
-     */
-    function turnTo () {
-
+      timer = setTimeout(() => {
+        move()
+      }, speed)
     }
 
     /**
@@ -437,11 +422,20 @@
     }
 
     /**
-     * 判断是否尾巴
+     * 判断是否咬到自己
      */
-    function isTail (x, y) {
-      const last = snakes.length - 1
-      return last >= 4 && snakes[last][0] === x && snakes[last][1] === y
+    function isSelf (x, y) {
+      const size = snakes.length
+      let self = false
+
+      for (var i = 4; i < size; i++) {
+        if (snakes[i][0] === x && snakes[i][1] === y) {
+          self = true
+          break
+        }
+      }
+
+      return self
     }
 
     /**
