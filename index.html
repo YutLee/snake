@@ -143,7 +143,7 @@
     </div>
   </div>
   <script>
-    let maxX = 10, maxY = 11, maxSize = maxX * maxY, snakes = [], food
+    let maxX = 10, maxY = 11, maxSize = maxX * maxY, snakes = [], emptySpace = [], food
     let directions = [[-1, 0], [0, -1], [1, 0], [0, 1]]// createInt(4) // direction 0:左,1:上,2:右,3:下
     let directionIdx = createInt(4)
     let direction = directions[directionIdx]
@@ -223,6 +223,7 @@
       space.forEach(item => {
         html += `<div class="row flex">`
         item.forEach(entry => {
+          emptySpace.push(entry)
           html += `<div class="column" id="${entry[0]}-${entry[1]}"></div>`
         })
         html += '</div>'
@@ -300,29 +301,15 @@
     }
 
     /**
-     * 生成两个随机整数数组
+     * 在场地内生成随机点
      */
-    function createPoint (maxX = 0, maxY = 0, existed = []) {
-      const x = [], y = []
+    function createPoint (existed = []) {
+      let empty, idx = 0
 
-      function next (max, arr) {
-        const random = createInt(max)
-        if (arr.indexOf(random) !== -1) {
-          return next(max, arr)
-        }
-        return random
-      }
+      empty = emptySpace.filter(item => existed.find(entry => entry[0] === item[0] && entry[1] === item[1]) === undefined)
+      idx = createInt(empty.length)
 
-      if (!existed) {
-        return [createInt(maxX), createInt(maxY)]
-      }
-
-      existed.forEach(item => {
-        x.push(item[0])
-        y.push(item[1])
-      })
-
-      return [next(maxX, x), next(maxY, y)]
+      return empty[idx]
     }
 
     /**
@@ -345,7 +332,7 @@
      * 生成食物
      */
     function createFood (snakes) {
-      food = createPoint(maxX, maxY, snakes)
+      food = createPoint(snakes)
       document.getElementById(`${food[0]}-${food[1]}`).className = 'column food'
     }
 
@@ -353,7 +340,7 @@
      * 生成蛇
      */
     function createSnake () {
-      const snake = createPoint(maxX, maxY)
+      const snake = createPoint()
       snakes.push(snake)
 
       if (snake[0] + 1 < maxX) {
