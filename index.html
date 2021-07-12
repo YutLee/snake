@@ -175,7 +175,18 @@
     }
 
     function handleKeyDown (event) {
-      const keyCode = event.which || event.keyCode
+      let keyCode = event.which || event.keyCode
+
+      if (keyCode === 65) { // A
+        keyCode = 37
+      } else if (keyCode === 87) { // W
+        keyCode = 38
+      } else if (keyCode === 68) { // D
+        keyCode = 39
+      } else if (keyCode === 83) { // S
+        keyCode = 40
+      }
+
       handleMove(keyCode)
     }
 
