@@ -147,7 +147,7 @@
     let directions = [[-1, 0], [0, -1], [1, 0], [0, 1]]// createInt(4) // direction 0:左,1:上,2:右,3:下
     let directionIdx = createInt(4)
     let direction = directions[directionIdx]
-    let gameOver = false, timer, isPause = false
+    let isOver = false, timer, isPause = false
     let score = 0 // 得分
     let speed = 500
 
@@ -277,7 +277,7 @@
       snakes = []
       directionIdx = createInt(4)
       direction = directions[directionIdx]
-      gameOver = false
+      isOver = false
       isPause = false
       score = 0
       start()
@@ -365,7 +365,22 @@
 
       clearTimeout(timer)
 
-      if (gameOver) return
+      if (isOver) return
+
+      if (isWall(x, y)) {
+        gameOver('蛇撞墙而亡')
+        return
+      }
+
+      if (isSelf(x, y)) {
+        gameOver('蛇吃了自己')
+        return
+      }
+
+      if (isWin()) {
+        gameOver('蛇吃饱了')
+        return
+      }
 
       snakes.unshift([x, y])
 
@@ -378,24 +393,6 @@
 
       snakeMove(last)
 
-      if (isWall(x, y)) {
-        gameOver = true
-        clearEvent('蛇撞墙而亡')
-        return
-      }
-
-      if (isSelf(x, y)) {
-        gameOver = true
-        clearEvent('蛇吃了自己')
-        return
-      }
-
-      if (isWin()) {
-        gameOver = true
-        clearEvent('蛇吃饱了')
-        return
-      }
-
       timer = setTimeout(() => {
         move()
       }, speed)
@@ -405,7 +402,7 @@
      * 判断是否墙壁
      */
     function isWall (x, y) {
-      return x < 0 || y < 0 || x > maxX || y > maxY
+      return x < 0 || y < 0 || x >= maxX || y >= maxY
     }
 
     /**
@@ -430,6 +427,15 @@
      */
     function isWin () {
       return snakes.length === maxSize
+    }
+
+    /**
+     * 游戏结束
+     */
+     function gameOver (text) {
+      isOver = true
+      clearTimeout(timer)
+      clearEvent(text)
     }
   </script>
 </body>
